@@ -6,7 +6,7 @@ from time import sleep, time
 import sys
 import termios
 import tty
-from key import *
+from classes.key import *
 from classes.mojo import ParkhausSystem as pk
 import classes.lcd as screen 
 

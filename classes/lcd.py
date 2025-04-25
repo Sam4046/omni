@@ -48,19 +48,28 @@ def lcd_string(message, line):
 def user_input_display(val):
 
     while True:
-        hello_msg= ""
-        gbey_msg = ""
-        warning_msg = ""
-        noPlace_msg = ""
-        stop_msg = ""
-        start_msg = ""
-        current_msg = ""
-        match val:
-            case 1:
-                current_msg = hello_msg
-                
+        hello_msg= "Willkommen"
+        gbey_msg = "Auf Wiedersehen"
+        warning_msg = "Zurckfahren Bitte"
+        noPlace_msg = "Kein Platz frei"
+        stop_msg = "Stop"
+        start_msg = "Auf geht's"
+        msg = ""
         
-        lcd_string(user_input[:16], LCD_LINE_1)
+        if val== 1:
+                msg = hello_msg
+        elif val== 2:
+                msg = gbey_msg
+        elif val== 3:
+                msg = warning_msg
+        elif val== 4:
+                msg = noPlace_msg
+        elif val== 5:
+                msg = stop_msg 
+        elif val== 6:
+                msg= start_msg           
+        
+        lcd_string(msg, LCD_LINE_1)
         time.sleep(2)
         lcd_byte(0x01, LCD_CMD)  # Display löschen
 
@@ -87,27 +96,27 @@ def user_input_display(val):
 #     time.sleep(2)
 #     lcd_byte(0x01, LCD_CMD)
 
-if __name__ == "__main__":
-    lcd_init()
-    while True:
-        print("\nWähle eine Option:")
-        print("1: Text anzeigen")
-        print("2: Rechnung berechnen")
-        print("3: Timer starten")
-        print("4: Beenden")
-        choice = input("Auswahl: ")
-        lcd_byte(0x01, LCD_CMD)
+# if __name__ == "__main__":
+#     lcd_init()
+#     while True:
+#         print("\nWähle eine Option:")
+#         print("1: Text anzeigen")
+#         print("2: Rechnung berechnen")
+#         print("3: Timer starten")
+#         print("4: Beenden")
+#         choice = input("Auswahl: ")
+#         lcd_byte(0x01, LCD_CMD)
         
-        if choice == '1':
-            user_input_display()
-        elif choice == '2':
-            calculate_expression()
-        elif choice == '3':
-            timer_function()
-        elif choice == '4':
-            lcd_string("Auf Wiedersehen", LCD_LINE_1)
-            time.sleep(2)
-            lcd_byte(0x01, LCD_CMD)
-            break
-        else:
-            print("Ungültige Auswahl!")
+#         if choice == '1':
+#             user_input_display()
+#         elif choice == '2':
+#             calculate_expression()
+#         elif choice == '3':
+#             timer_function()
+#         elif choice == '4':
+#             lcd_string("Auf Wiedersehen", LCD_LINE_1)
+#             time.sleep(2)
+#             lcd_byte(0x01, LCD_CMD)
+#             break
+#         else:
+#             print("Ungültige Auswahl!")
