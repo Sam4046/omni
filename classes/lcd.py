@@ -45,37 +45,47 @@ def lcd_string(message, line):
     for char in message:
         lcd_byte(ord(char), LCD_CHR)
 
-def user_input_display():
+def user_input_display(val):
+
     while True:
-        user_input = input("Gib etwas ein (oder 'exit' zum Beenden): ")
-        if user_input.lower() == 'exit':
-            break
+        hello_msg= ""
+        gbey_msg = ""
+        warning_msg = ""
+        noPlace_msg = ""
+        stop_msg = ""
+        start_msg = ""
+        current_msg = ""
+        match val:
+            case 1:
+                current_msg = hello_msg
+                
+        
         lcd_string(user_input[:16], LCD_LINE_1)
         time.sleep(2)
         lcd_byte(0x01, LCD_CMD)  # Display löschen
 
-def calculate_expression():
-    while True:
-        expression = input("Gib eine Rechnung ein (oder 'exit' zum Beenden): ")
-        if expression.lower() == 'exit':
-            break
-        try:
-            result = str(eval(expression))
-        except Exception as e:
-            result = "Fehler!"
-        lcd_string(expression[:16], LCD_LINE_1)
-        lcd_string(result[:16], LCD_LINE_2)
-        time.sleep(3)
-        lcd_byte(0x01, LCD_CMD)
+# def calculate_expression():
+#     while True:
+#         expression = input("Gib eine Rechnung ein (oder 'exit' zum Beenden): ")
+#         if expression.lower() == 'exit':
+#             break
+#         try:
+#             result = str(eval(expression))
+#         except Exception as e:
+#             result = "Fehler!"
+#         lcd_string(expression[:16], LCD_LINE_1)
+#         lcd_string(result[:16], LCD_LINE_2)
+#         time.sleep(3)
+#         lcd_byte(0x01, LCD_CMD)
 
-def timer_function():
-    seconds = int(input("Gib die Timer-Dauer in Sekunden ein: "))
-    for i in range(seconds, 0, -1):
-        lcd_string(f"Timer: {i}s", LCD_LINE_1)
-        time.sleep(1)
-    lcd_string("Zeit abgelaufen!", LCD_LINE_1)
-    time.sleep(2)
-    lcd_byte(0x01, LCD_CMD)
+# def timer_function():
+#     seconds = int(input("Gib die Timer-Dauer in Sekunden ein: "))
+#     for i in range(seconds, 0, -1):
+#         lcd_string(f"Timer: {i}s", LCD_LINE_1)
+#         time.sleep(1)
+#     lcd_string("Zeit abgelaufen!", LCD_LINE_1)
+#     time.sleep(2)
+#     lcd_byte(0x01, LCD_CMD)
 
 if __name__ == "__main__":
     lcd_init()
