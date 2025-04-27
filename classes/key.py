@@ -1,12 +1,12 @@
-#import RPi.GPIO as gp
-#from gpiozero import OutputDevice
+import RPi.GPIO as gp
+from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
 import sys
 import termios
 import tty
-
+import lcd as v
 
  
 

@@ -6,6 +6,7 @@ from time import sleep, time
 import sys
 import termios
 import tty
+import lcd as v
 
 # gp.setmode(gp.BOARD) # Board Pins (deaktiviert)
 gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
