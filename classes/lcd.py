@@ -1,123 +1,75 @@
 import smbus2 as smbus
 import time
 
-# Adresse des I2C-LCDs
-I2C_ADDR = 0x27
-LCD_WIDTH = 16  # Für ein 16x2 Display
+class LCD:
+    I2C_ADDR = 0x27
+    LCD_WIDTH = 16  # 16 characters per line
 
-# LCD Befehle
-LCD_CHR = 1  # Zeichenmodus
-LCD_CMD = 0  # Befehlsmodus
+    LCD_CHR = 1  # Character mode
+    LCD_CMD = 0  # Command mode
 
-LCD_LINE_1 = 0x80  # Erste Zeile
-LCD_LINE_2 = 0xC0  # Zweite Zeile
+    LCD_LINE_1 = 0x80  # First line
+    LCD_LINE_2 = 0xC0  # Second line
 
-ENABLE = 0b00000100  # Enable Bit
-BACKLIGHT = 0x08  # Hintergrundbeleuchtung EIN
+    ENABLE = 0b00000100  # Enable bit
+    BACKLIGHT = 0x08     # Backlight ON
 
-# Initialisiere I2C (Bus 1 für Raspberry Pi)
-bus = smbus.SMBus(1)
+    def __init__(self, bus_number=1):
+        self.bus = smbus.SMBus(bus_number)
+        self.init_display()
 
-def lcd_byte(bits, mode):
-    try:
-        high = mode | (bits & 0xF0) | BACKLIGHT | ENABLE
-        low = mode | ((bits << 4) & 0xF0) | BACKLIGHT | ENABLE
-        bus.write_byte(I2C_ADDR, high)
-        bus.write_byte(I2C_ADDR, high & ~ENABLE)
-        bus.write_byte(I2C_ADDR, low)
-        bus.write_byte(I2C_ADDR, low & ~ENABLE)
-    except Exception as e:
-        print(f"I2C-Fehler: {e}")
+    def init_display(self):
+        """Initialize the LCD display."""
+        time.sleep(0.5)
+        self.send_byte(0x33, self.LCD_CMD)
+        self.send_byte(0x32, self.LCD_CMD)
+        self.send_byte(0x28, self.LCD_CMD)
+        self.send_byte(0x0C, self.LCD_CMD)
+        self.send_byte(0x06, self.LCD_CMD)
+        self.clear()
 
-def lcd_init():
-    time.sleep(0.5)
-    lcd_byte(0x33, LCD_CMD)
-    lcd_byte(0x32, LCD_CMD)
-    lcd_byte(0x28, LCD_CMD)
-    lcd_byte(0x0C, LCD_CMD)
-    lcd_byte(0x06, LCD_CMD)
-    lcd_byte(0x01, LCD_CMD)
-    time.sleep(0.5)
+    def send_byte(self, bits, mode):
+        """Send a byte to the LCD."""
+        try:
+            high = mode | (bits & 0xF0) | self.BACKLIGHT | self.ENABLE
+            low = mode | ((bits << 4) & 0xF0) | self.BACKLIGHT | self.ENABLE
+            self.bus.write_byte(self.I2C_ADDR, high)
+            self.bus.write_byte(self.I2C_ADDR, high & ~self.ENABLE)
+            self.bus.write_byte(self.I2C_ADDR, low)
+            self.bus.write_byte(self.I2C_ADDR, low & ~self.ENABLE)
+        except Exception as e:
+            print(f"I2C error: {e}")
 
-def lcd_string(message, line):
-    message = message.ljust(LCD_WIDTH, ' ')
-    lcd_byte(line, LCD_CMD)
-    for char in message:
-        lcd_byte(ord(char), LCD_CHR)
+    def send_string(self, message, line, center=False):
+        """Send a string to a specific line."""
+        if center:
+            message = message.center(self.LCD_WIDTH)
+        else:
+            message = message.ljust(self.LCD_WIDTH, ' ')
 
-def user_input_display(val):
+        self.send_byte(line, self.LCD_CMD)
+        for char in message:
+            self.send_byte(ord(char), self.LCD_CHR)
 
-        while True:
-                hello_msg= "Willkommen"
-                gbey_msg = "Auf Wiedersehen"
-                warning_msg = "Zurckfahren Bitte"
-                noPlace_msg = "Kein Platz frei"
-                stop_msg = "Stop"
-                start_msg = "Auf geht's"
-                msg = ""
-        
-                if val== 1:
-                        msg = hello_msg
-                elif val== 2:
-                        msg = gbey_msg
-                elif val== 3:
-                        msg = warning_msg
-                elif val== 4:
-                        msg = noPlace_msg
-                elif val== 5:
-                        msg = stop_msg 
-                elif val== 6:
-                        msg= start_msg 
-          
-                print (msg)
-                lcd_string(msg, LCD_LINE_1)
-                time.sleep(2)
-                lcd_byte(0x01, LCD_CMD)  # Display löschen
+    def display_text(self, text, center=False):
+        """Display text across one or two lines."""
+        text = str(text)
 
-# def calculate_expression():
-#     while True:
-#         expression = input("Gib eine Rechnung ein (oder 'exit' zum Beenden): ")
-#         if expression.lower() == 'exit':
-#             break
-#         try:
-#             result = str(eval(expression))
-#         except Exception as e:
-#             result = "Fehler!"
-#         lcd_string(expression[:16], LCD_LINE_1)
-#         lcd_string(result[:16], LCD_LINE_2)
-#         time.sleep(3)
-#         lcd_byte(0x01, LCD_CMD)
+        if len(text) <= self.LCD_WIDTH:
+            self.send_string(text, self.LCD_LINE_1, center)
+        else:
+            first_line = text[:self.LCD_WIDTH]
+            second_line = text[self.LCD_WIDTH:self.LCD_WIDTH*2]
 
-# def timer_function():
-#     seconds = int(input("Gib die Timer-Dauer in Sekunden ein: "))
-#     for i in range(seconds, 0, -1):
-#         lcd_string(f"Timer: {i}s", LCD_LINE_1)
-#         time.sleep(1)
-#     lcd_string("Zeit abgelaufen!", LCD_LINE_1)
-#     time.sleep(2)
-#     lcd_byte(0x01, LCD_CMD)
+            self.send_string(first_line, self.LCD_LINE_1, center)
+            self.send_string(second_line, self.LCD_LINE_2, center)
 
-# if __name__ == "__main__":
-#     lcd_init()
-#     while True:
-#         print("\nWähle eine Option:")
-#         print("1: Text anzeigen")
-#         print("2: Rechnung berechnen")
-#         print("3: Timer starten")
-#         print("4: Beenden")
-#         choice = input("Auswahl: ")
-#         lcd_byte(0x01, LCD_CMD)
-        
-#         if choice == '1':
-#             user_input_display()
-#         elif choice == '2':
-#             calculate_expression()
-#         elif choice == '3':
-#             timer_function()
-#         elif choice == '4':
-#             lcd_string("Auf Wiedersehen", LCD_LINE_1)
-#             time.sleep(2)
-#             lcd_byte(0x01, LCD_CMD)
-#             break
-#         else:
-#             print("Ungültige Auswahl!")
+    def display_two_lines(self, text_line1, text_line2, center=False):
+        """Display two separate lines."""
+        self.send_string(str(text_line1)[:self.LCD_WIDTH], self.LCD_LINE_1, center)
+        self.send_string(str(text_line2)[:self.LCD_WIDTH], self.LCD_LINE_2, center)
+
+    def clear(self):
+        """Clear the LCD display."""
+        self.send_byte(0x01, self.LCD_CMD)
+        time.sleep(0.5)
