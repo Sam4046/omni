@@ -1,5 +1,5 @@
-import RPi.GPIO as gp
-from gpiozero import OutputDevice
+#import RPi.GPIO as gp
+#from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
@@ -84,14 +84,16 @@ class Manuell:
             key = self.get_key()
             if key == "w":
                 print("⬆️ Schritt hoch")
-                self.step_motor(1, direction=1)
+                #self.step_motor(1, direction=1)
             elif key == "s":
                 print("⬇️ Schritt runter")
-                self.step_motor(1, direction=-1)
+                #self.step_motor(1, direction=-1)
             elif key == "d":
-                self.tor_auf()
+                print ("tor auf")
+                #self.tor_auf()
             elif key == "a":
-                self.tor_zu()
+                print("tor zu")
+                #self.tor_zu()
             elif key == "q":
                 print("🚦 Beenden...")
                 break
