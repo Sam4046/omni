@@ -3,10 +3,7 @@ from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
-import sys
-import termios
-import tty
-import lcd as v
+import LCD as v
 
 # gp.setmode(gp.BOARD) # Board Pins (deaktiviert)
 gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
@@ -15,15 +12,22 @@ gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
 gp.setup(24, gp.IN, pull_up_down=gp.PUD_UP) 
 gp.setup(25, gp.IN, pull_up_down=gp.PUD_UP)
 
-class ParkhausSystem:
+class Mojo:
     def __init__(self):
         
         # Motorsteuerung
-        self.motor_pins = [OutputDevice(pin) for pin in [14, 15, 18, 23]] # Stepmotor hat 14, 15, 18 und 23 GPIO (siehe Bilder)
+        # Stepmotor hat 14, 15, 18 und 23 GPIO (siehe Bilder)
+        self.motor_pins = [OutputDevice(pin) for pin in [14, 15, 18, 23]] 
         self.step_sequence = [
-            [1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0],
-            [0, 0, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1], [1, 0, 0, 1]
-        ]
+            [1, 0, 0, 0], 
+            [1, 1, 0, 0], 
+            [0, 1, 0, 0], 
+            [0, 1, 1, 0],
+            [0, 0, 1, 0], 
+            [0, 0, 1, 1], 
+            [0, 0, 0, 1], 
+            [1, 0, 0, 1]
+            ]
         
         self.pos = 0                # Definieren von Position 0 = Tor ist zu
         self.max_schritte = 130     # Nach 130 Schritten geht die Tor ist auf oder Max Position
@@ -31,6 +35,7 @@ class ParkhausSystem:
         
         
         self.start = 0
+        
         # Sensoren
         self.irs_enter = 24         # Eingangsensor hat GPIO 24 / pin 18 (siehe Bilder)
         self.irs_exit = 25          # Eingangsensor hat GPIO 25 / pin 22 (siehe Bilder)
@@ -114,7 +119,7 @@ class ParkhausSystem:
     # Timerzaehler       
         if time > 0:
             i=0
-            print (" ⬇️ die Rampe fährt runter in :") 
+            print (" ⬇️ die Schranke fährt runter in :") 
             for i in range(time):
                 sleep(1)
                 i +=1
@@ -124,7 +129,7 @@ class ParkhausSystem:
 # Funktion fuer die Einfahrtprozess
     def einfahrt(self):
         if self.parkp > 0:
-            print("🚗 Einfahrt erkannt. Rampe öffnet...")
+            print("🚗 Einfahrt erkannt. Schranke öffnet...")
             self.tor_auf()
             
             timeout = time() + 3  # Maximale Wartezeit für Sensor
@@ -136,14 +141,14 @@ class ParkhausSystem:
                     return
                 sleep(0.02)  # Schnellere Erkennung
             
-            print("❌ Einfahrt abgebrochen. Rampe fährt runter...")
+            print("❌ Einfahrt abgebrochen. Schranke fährt runter...")
             self.tor_zu(0)
         return self.parkp
             
 # Funktion fuer die Ausfahrtprozess
     def ausfahrt(self):
         if self.parkp < self.max_pp:
-            print("🚙 Ausfahrt erkannt. Rampe öffnet...")
+            print("🚙 Ausfahrt erkannt. Schranke öffnet...")
             self.tor_auf()
             timeout = time() + 3  # Maximale Wartezeit für Sensor
             
@@ -154,7 +159,7 @@ class ParkhausSystem:
                     return
                 sleep(0.02)  # Schnellere Erkennung
             
-            print("❌ Ausfahrt abgebrochen. Rampe fährt runter...")
+            print("❌ Ausfahrt abgebrochen. Schranke fährt runter...")
             self.tor_zu(0)
             
         else:
@@ -164,15 +169,31 @@ class ParkhausSystem:
 
     def get_parkp(self):
         return self.parkp
+    
+    def is_activeted(self,val):
+        val = val.lower()
+        activ_a = False
+        activ_b = False
+
+        if val == "a":
+            return not gp.input(self.irs_enter)
+        if val == "b"  :
+            return not gp.input(self.irs_exit) 
+        else:
+            print ("kein gültige Sensor")
+
 # Hauptprogramm 
     def run(self):
         try:
             print("🚀 Parkhaussystem gestartet... 🚀🚀🚀")
-            #self.auto_recovery()
+            self.auto_recovery()
             while True:
-                if not gp.input(self.irs_enter):
+                active = self.is_activeted("a")
+                if active:
                     self.einfahrt()
-                if not gp.input(self.irs_exit):
+
+                active = self.is_activeted("b")
+                if active:
                     self.ausfahrt()
                 sleep(0.02)  # Schnellere Hauptschleife
         except KeyboardInterrupt:

@@ -1,7 +1,7 @@
-from classes.key import *
-from classes.mojo import ParkhausSystem as pk
-import classes.lcd as screen 
-
+from classes.Key import *
+from classes.Mojo import ParkhausSystem as pk
+import classes.LCD as screen 
+from classes.Traffic import Traffic as tr
 
 # die freie verfügbare Parkplätze 
 FreeP = pk.get_parkp()
