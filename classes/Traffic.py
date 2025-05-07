@@ -4,13 +4,21 @@ import RPi.GPIO as GPIO
 
 
 class Traffic:
-    def __init__(self):
+    def __init__(self,
+        red_en = 7,
+        green_en = 8,
+        red_ex = 4,
+        green_ex = 17,
+        buzzer = 27,
+        ):
+
         GPIO.setmode(GPIO.BCM)
-        self.red_en = 7
-        self.green_en = 8
-        self.red_ex = 4
-        self.green_ex = 17
-        self.buzzer = 27
+
+        self.red_en = red_en
+        self.green_en = green_en
+        self.red_ex = red_ex
+        self.green_ex = green_ex
+        self.buzzer = buzzer
 
         self.list_led_low = ["low_all", 
                              "low_en", 
@@ -20,7 +28,8 @@ class Traffic:
                              "low_red_ex", 
                              "low_green_ex"
                              ]
-
+        
+        #LEDs and Buzzer definieren
         GPIO.setup(self.red_en, GPIO.OUT)
         GPIO.setup(self.green_en, GPIO.OUT)
         GPIO.setup(self.red_ex, GPIO.OUT)
@@ -33,8 +42,9 @@ class Traffic:
             GPIO.output(self.buzzer, 1)
         else:
             GPIO.output(self.buzzer, 0)
-
+# Traffic Light Controller
     def red_on(self,en=True,ex=True,alone=False):
+
         if not alone:
             if en and ex:
                 GPIO.output(self.red_en, 1)
@@ -48,7 +58,6 @@ class Traffic:
             else:
                 GPIO.output(self.red_en, 0)
                 GPIO.output(self.red_ex, 0)
-
         else:
             if en:
                 GPIO.output(self.red_en, 1)
@@ -56,7 +65,7 @@ class Traffic:
                 GPIO.output(self.red_ex, 1)
 
     def green_on(self,en=True,ex=True,alone=False):
-    
+
         if not alone:
             if en and ex:
                 GPIO.output(self.green_en, 1)
@@ -77,6 +86,15 @@ class Traffic:
                 GPIO.output(self.green_ex, 1)
            
     def led_off(self, mode="low_all"):
+
+        """ 
+            mode indexex 
+            0. All OFF     | 
+            1. Entry OFF   | 2. Exit OFF    |
+            3. Red Entry   | 4. Green Entry | 
+            5. Red Exit    | 6. Green Exit  |
+        """
+
         if isinstance(mode, int):
             if 0 <= mode < len(self.list_led_low):
                 mode = self.list_led_low[mode]
@@ -114,7 +132,7 @@ class Traffic:
             GPIO.output(self.green_ex, 0)
 
     #Seriene
-    def denger(self,sleepTime=0.3):
+    def danger(self,sleepTime=0.3):
         self.high_buz()
         out(sleepTime)
         self.high_buz(False)

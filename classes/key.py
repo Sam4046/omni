@@ -6,11 +6,12 @@ from time import sleep, time
 import sys
 import termios
 import tty
-import lcd as v
+import LCD as v
 
  
 
 class Manuell:
+    
     #GPIO Setup
     gp.setmode(gp.BCM)  
     gp.setup([24, 25], gp.IN, pull_up_down=gp.PUD_UP) 
