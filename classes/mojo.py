@@ -177,6 +177,6 @@ class Mojo:
         elif val == "b"  :
             return not gp.input(self.irs_exit) 
         else:
-            print ("kein Sensor aktiv")
+            print ("kein Sensor aktiv.")
             return False
         
