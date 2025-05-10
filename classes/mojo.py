@@ -112,19 +112,16 @@ class Mojo:
             self.step_motor(self.max_schritte - self.pos, direction=1)
 
 # Funktoin Rampa hoch
-    def tor_zu(self,time=3,active=False):
+    def tor_zu(self,time=3):
     # Time 
-        if self.pos > 0 and not active:
-            self.step_motor(self.pos, direction=-1)
-        else:
-            self.tor_auf()       
+        if self.pos > 0:
+            self.step_motor(self.pos, direction=-1)                
     # Timerzaehler       
         if time > 0:
             print (" ⬇️ die Schranke fährt runter in :") 
             for i in range(time):
                 a= self.is_activeted("a")
                 b= self.is_activeted("b")
-
                 if not a or not b :
                     sleep(1)
                     print (" ... ",i)
@@ -135,7 +132,6 @@ class Mojo:
         if self.parkp > 0:
             print("🚗 Einfahrt erkannt. Schranke öffnet...")
             self.tor_auf()
-            
             timeout = time() + 3  # Maximale Wartezeit für Sensor
             
             while time() < timeout:
@@ -176,14 +172,12 @@ class Mojo:
     
     def is_activeted(self,val):
         val = val.lower()
-        activ_a = False
-        activ_b = False
 
         if val == "a":
             return not gp.input(self.irs_enter)
         elif val == "b"  :
             return not gp.input(self.irs_exit) 
         else:
-            print ("...")
+            print ("kein Sensor aktiv")
             return False
         
