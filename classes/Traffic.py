@@ -121,10 +121,11 @@ class Traffic:
                 GPIO.output(self.green_en, 1)
                 self.state[1] = True
                 
-            if ex:
+            elif ex:
                 GPIO.output(self.green_ex, 1)
                 self.state[3] = True 
-           
+            else:
+                pass
     def led_off(self, mode="low_all"):
 
         """

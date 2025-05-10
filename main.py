@@ -46,9 +46,9 @@ try:
 # Einfahrt -> Sensor A aktiviert >> 
         if pk.is_activeted("a"):
             
-            if pk.get_parkp() == 4:
-                light.red_on()
-                light.green_on(False,False)
+            if pk.get_parkp() == 0:
+                light.red_on(False)
+                light.green_on(False,True)
                 lcd.display_two_lines("Kein Platz","frei",True)
                 sleep(2)
                 
