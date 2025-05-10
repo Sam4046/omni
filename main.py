@@ -71,14 +71,21 @@ light = Traffic()
 # Startinfo
 print("🚀 Parkhaussystem gestartet...")
 
-lcd.clear()
+
+
+
+light.red_on()
 
 pk.auto_recovery()
 
 lcd.display_two_lines("Parkhaus bereit", f"Frei: {pk.get_parkp()}")
 sleep(3)
 
+light.red_on()
+light.green_on()
 light.led_off()
+
+light.green_on()
 
 light.cleanPi()
 
@@ -88,13 +95,16 @@ try:
         freie_plaetze = pk.get_parkp()
         lcd.display_two_lines("Verfuegbar:", f"{freie_plaetze} Plaetze",True)
         
-        
+        light.led_off(3)
         light.green_on()
         
         
         # Sensor A = Einfahrt
         if pk.is_activeted("a"):
+            
+            light.led_off(4)
             light.red_on()
+            
             lcd.display_text("Einfahrt erkannt",True)
             pk.tor_auf()
             timeout = time() + 3
@@ -110,8 +120,10 @@ try:
         # Sensor B = Ausfahrt
         elif pk.is_activeted("b"):
             
+            light.led_off(4)
             light.red_on()
-            lcd.display_text("Ausfahrt erkannt")
+            
+            lcd.display_text("Ausfahrt erkannt",True)
             pk.tor_auf()
             timeout = time() + 3
             
@@ -128,7 +140,7 @@ try:
 
 except KeyboardInterrupt:
     print("\n🚦 Programm manuell beendet.")
-    lcd.display_text("System gestoppt")
+    lcd.display_text("System gestoppt",True)
     sleep(2)
 finally:
     gp.cleanup()
