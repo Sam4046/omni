@@ -72,8 +72,6 @@ light = Traffic()
 print("🚀 Parkhaussystem gestartet...")
 
 
-
-
 light.red_on()
 
 pk.auto_recovery()

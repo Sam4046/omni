@@ -19,7 +19,15 @@ class Traffic:
         self.red_ex = red_ex
         self.green_ex = green_ex
         self.buzzer = buzzer
-
+        
+        # 0= red_en, 1= green_en, 2= red_ex, 3= green_ex
+        self.state=[
+            False,
+            False,
+            False,
+            False 
+        ]
+        
         self.list_led_low = ["low_all", 
                              "low_en", 
                              "low_ex", 
@@ -49,50 +57,78 @@ class Traffic:
             if en and ex:
                 GPIO.output(self.red_en, 1)
                 GPIO.output(self.red_ex, 1)
+                self.state[0] = True
+                self.state[2] = True 
+                
             elif en and not ex:
                 GPIO.output(self.red_en, 1)
                 GPIO.output(self.red_ex, 0)
+                self.state[0] = True
+                self.state[2] = False
+                
             elif not en and ex:
                 GPIO.output(self.red_en, 0)
                 GPIO.output(self.red_ex, 1)
+                self.state[0] = False
+                self.state[2] = True
+                
             else:
                 GPIO.output(self.red_en, 0)
                 GPIO.output(self.red_ex, 0)
+                self.state[0] = False
+                self.state[2] = False
+                
         else:
             if en:
                 GPIO.output(self.red_en, 1)
+                self.state[0] = True
+                
             else:
                 GPIO.output(self.red_ex, 1)
+                self.state[2] = True
 
     def green_on(self,en=True,ex=True,alone=False):
 
         if not alone:
+            
             if en and ex:
                 GPIO.output(self.green_en, 1)
                 GPIO.output(self.green_ex, 1)
+                self.state[1] = True
+                self.state[3] = True 
+                
             elif en and not ex:
                 GPIO.output(self.green_en, 1)
                 GPIO.output(self.green_ex, 0)
+                self.state[1] = True
+                self.state[3] = False 
+                
             elif not en and ex:    
                 GPIO.output(self.green_en, 0)
                 GPIO.output(self.green_ex, 1)
+                self.state[1] = False
+                self.state[3] = True 
+                
             else:
                 GPIO.output(self.green_en, 0)
                 GPIO.output(self.green_ex, 0)
+                self.state[1] = False
+                self.state[3] = False
+                
         else:
+            
             if en:
                 GPIO.output(self.green_en, 1)
+                self.state[1] = True
+                
             if ex:
                 GPIO.output(self.green_ex, 1)
+                self.state[3] = True 
            
     def led_off(self, mode="low_all"):
 
-        """ 
-            mode indexex 
-            0. All OFF     | 
-            1. Entry OFF   | 2. Exit OFF    |
-            3. Red Entry   | 4. Green Entry | 
-            5. Red Exit    | 6. Green Exit  |
+        """
+        mode indexex 0. All OFF     | 1. Entry OFF   | 2. Exit OFF    |3. Red Entry   | 4. Green Entry | 5. Red Exit    | 6. Green Exit  |
         """
 
         if isinstance(mode, int):
@@ -110,26 +146,38 @@ class Traffic:
             GPIO.output(self.green_en, 0)
             GPIO.output(self.red_ex, 0)
             GPIO.output(self.green_ex, 0)
+            self.state[0] = False
+            self.state[1] = False
+            self.state[2] = False
+            self.state[3] = False  
 
         elif mode == "low_en":
             GPIO.output(self.red_en, 0)
             GPIO.output(self.green_en, 0)
+            self.state[0] = False
+            self.state[1] = False
             
         elif mode == "low_ex":
             GPIO.output(self.red_ex, 0)
             GPIO.output(self.green_ex, 0)
+            self.state[2] = False
+            self.state[3] = False
 
         elif mode == "low_red_en":
             GPIO.output(self.red_en, 0)
+            self.state[0] = False
 
         elif mode == "low_green_en":
             GPIO.output(self.green_en, 0)
+            self.state[1] = False
 
         elif mode == "low_red_ex":
             GPIO.output(self.red_ex, 0)
+            self.state[2] = False
 
         elif mode == "low_green_ex":
             GPIO.output(self.green_ex, 0)
+            self.state[3] = False 
 
     #Seriene
     def danger(self,sleepTime=0.3):
