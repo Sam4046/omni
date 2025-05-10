@@ -72,4 +72,4 @@ class LCD:
     def clear(self):
         """Clear the LCD display."""
         self.send_byte(0x01, self.LCD_CMD)
-        time.sleep(0.5)
+        time.sleep(0.2)

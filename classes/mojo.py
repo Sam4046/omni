@@ -112,19 +112,23 @@ class Mojo:
             self.step_motor(self.max_schritte - self.pos, direction=1)
 
 # Funktoin Rampa hoch
-    def tor_zu(self,time=3):
+    def tor_zu(self,time=3,active=False):
     # Time 
-        if self.pos > 0:
-            self.step_motor(self.pos, direction=-1)       
+        if self.pos > 0 and not active:
+            self.step_motor(self.pos, direction=-1)
+        else:
+            self.tor_auf()       
     # Timerzaehler       
         if time > 0:
-            i=0
             print (" ⬇️ die Schranke fährt runter in :") 
             for i in range(time):
-                sleep(1)
-                i +=1
-                print (" ... ",i)
-            print (" Tor ist zu ") 
+                a= self.is_activeted("a")
+                b= self.is_activeted("b")
+
+                if not a or not b :
+                    sleep(1)
+                    print (" ... ",i)
+                print (" Tor ist zu ") 
             
 # Funktion fuer die Einfahrtprozess
     def einfahrt(self):
@@ -177,27 +181,9 @@ class Mojo:
 
         if val == "a":
             return not gp.input(self.irs_enter)
-        if val == "b"  :
+        elif val == "b"  :
             return not gp.input(self.irs_exit) 
         else:
-            print ("kein gültige Sensor")
-
-# Hauptprogramm 
-    def run(self):
-        try:
-            print("🚀 Parkhaussystem gestartet... 🚀🚀🚀")
-            self.auto_recovery()
-            while True:
-                active = self.is_activeted("a")
-                if active:
-                    self.einfahrt()
-
-                active = self.is_activeted("b")
-                if active:
-                    self.ausfahrt()
-                sleep(0.02)  # Schnellere Hauptschleife
-        except KeyboardInterrupt:
-            print("\n🚦 Programm beendet.")
-        finally:
-            self.set_step([0, 0, 0, 0])
-            gp.cleanup()
+            print ("...")
+            return False
+        
