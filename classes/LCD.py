@@ -66,7 +66,6 @@ class LCD:
             self.send_string(second_line, self.LCD_LINE_2, center)
 
     def display_two_lines(self, text_line1, text_line2, center=False):
-        self.clear()
         """Display two separate lines."""
         self.send_string(str(text_line1)[:self.LCD_WIDTH], self.LCD_LINE_1, center)
         self.send_string(str(text_line2)[:self.LCD_WIDTH], self.LCD_LINE_2, center)

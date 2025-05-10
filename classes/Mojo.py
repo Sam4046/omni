@@ -3,7 +3,6 @@ from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
-import LCD as v
 
 # gp.setmode(gp.BOARD) # Board Pins (deaktiviert)
 gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm

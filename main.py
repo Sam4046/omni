@@ -13,7 +13,7 @@ gp.setmode(gp.BCM)
 
 # Initialisierung
 pk = Mojo()
-lcd = LCD()
+view = LCD()
 
 def tor_zu_mit_sicherheitscheck():
     close_delay = 3
@@ -23,7 +23,7 @@ def tor_zu_mit_sicherheitscheck():
             print("⚠️ Sensor blockiert – Schranke öffnet wieder.")
             pk.tor_auf()
             return False
-        lcd.display_two_lines("⚠️ Schranke schließt", f"In {close_delay - i}s")
+        view.display_two_lines("Schranke schließt", f"In {close_delay - i}s")
         sleep(1)
     pk.tor_zu()
     return True
@@ -45,33 +45,33 @@ def get_key():
 
 def menu_action(key):
     if key == "m":
-        lcd.display_text("Manuell aktiviert",True)
+        view.display_text("Manuell aktiviert",True)
         print("🎮 Manuelle Steuerung gestartet...")
         system = Manuell()
         system.steuerung()
-        lcd.display_two_lines("Zuruck zum","System",True)
+        view.display_two_lines("Zuruck zum","System",True)
 
     elif key == "s":
-        lcd.display_two_lines("🔍 STATUS", f"Frei: {pk.get_parkp()}")
+        view.display_two_lines("STATUS", f"Frei: {pk.get_parkp()}")
         print("📋 Status angezeigt")
 
     elif key == "e":
-        lcd.display_text("⚙️ Einstellungen")
+        view.display_text("⚙️ Einstellungen")
         print("⚙️ Menü: Einstellungen – Platzlimit ändern (funktion vorbereitet)")
         sleep(2)
 
     elif key == "q":
-        lcd.display_text("🛑 Beendet")
+        view.display_text("🛑 Beendet")
         print("❌ System wird beendet...")
         sleep(2)
         gp.cleanup()
-        lcd.clear()
+        view.clear()
         sys.exit(0)
 
 # Startinfo
 print("🚀 Parkhaussystem gestartet...")
 pk.auto_recovery()
-lcd.display_two_lines("Parkhaus bereit", f"Frei: {pk.get_parkp()}")
+view.display_two_lines("Parkhaus bereit", f"Frei: {pk.get_parkp()}")
 
 try:
     while True:
@@ -81,11 +81,11 @@ try:
             menu_action(key)
 
         freie_plaetze = pk.get_parkp()
-        lcd.display_two_lines("Verfügbar:", f"{freie_plaetze} Plätze")
+        view.display_two_lines("Verfügbar:", f"{freie_plaetze} Plätze")
 
         # Sensor A = Einfahrt
         if pk.is_activeted("a"):
-            lcd.display_text("🚗 Einfahrt erkannt")
+            view.display_text("Einfahrt erkannt")
             pk.tor_auf()
             timeout = time() + 4
             while time() < timeout:
@@ -100,13 +100,13 @@ try:
 
         # Sensor B = Ausfahrt
         elif pk.is_activeted("b"):
-            lcd.display_text("🚙 Ausfahrt erkannt")
+            view.display_text("Ausfahrt erkannt")
             pk.tor_auf()
             timeout = time() + 4
             while time() < timeout:
                 if not gp.input(24):
                     pk.add_parkplatz()
-                    tor_zu_mit_sicherheitscheck()
+                    # tor_zu_mit_sicherheitscheck()
                     break
                 if pk.is_activeted("a") or pk.is_activeted("b"):
                     pk.tor_auf()
@@ -117,8 +117,8 @@ try:
 
 except KeyboardInterrupt:
     print("\n🚦 Programm manuell beendet.")
-    lcd.display_text("🛑 System gestoppt")
+    view.display_text("System gestoppt")
     sleep(2)
 finally:
     gp.cleanup()
-    lcd.clear()
+    view.clear()

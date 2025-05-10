@@ -6,7 +6,7 @@ from time import sleep, time
 import sys
 import termios
 import tty
-import LCD as v
+
 
  
 
