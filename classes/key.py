@@ -6,7 +6,6 @@ from time import sleep, time
 import sys
 import termios
 import tty
-import LCD as v
 
  
 
@@ -85,16 +84,16 @@ class Manuell:
             key = self.get_key()
             if key == "w":
                 print("⬆️ Schritt hoch")
-                #self.step_motor(1, direction=1)
+                self.step_motor(1, direction=1)
             elif key == "s":
                 print("⬇️ Schritt runter")
-                #self.step_motor(1, direction=-1)
+                self.step_motor(1, direction=-1)
             elif key == "d":
                 print ("tor auf")
-                #self.tor_auf()
+                self.tor_auf()
             elif key == "a":
                 print("tor zu")
-                #self.tor_zu()
+                self.tor_zu()
             elif key == "q":
                 print("🚦 Beenden...")
                 break
@@ -110,6 +109,4 @@ class Manuell:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
         return key.lower()
 
-if __name__ == "__main__":
-    system = Manuell()
     

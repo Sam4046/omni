@@ -43,29 +43,39 @@ try:
         light.green_on()
         
         
-# Sensor A aktiviert >> Einfahrt
+# Einfahrt -> Sensor A aktiviert >> 
         if pk.is_activeted("a"):
             
-            light.red_on()
-            light.green_on(False,False)
-            lcd.display_text("Einfahrt erkannt",True)
-            pk.einfahrt()
+            if pk.get_parkp() == 4:
+                light.red_on()
+                light.green_on(False,False)
+                lcd.display_two_lines("Kein Platz","frei",True)
+                sleep(2)
+                
+            else:
+                light.red_on()
+                light.green_on(False,False)
+                lcd.display_two_lines("Einfahrt erkannt",">>>",True)
+                pk.einfahrt()
             
 
-# Sensor B aktiviert >> Ausfahrt
-        if pk.is_activeted("b"):
+# Ausfahrt -> Sensor B aktiviert >> 
+        elif pk.is_activeted("b"):
             
             light.red_on()
             light.green_on(False,False)
-            lcd.display_text("Ausfahrt erkannt",True)
+            lcd.display_two_lines("Ausfahrt erkannt","<<<",True)
             pk.ausfahrt()
+        
+        
 
         sleep(0.02)
 
 except KeyboardInterrupt:
     print("\n🚦 Programm manuell beendet.")
-    lcd.display_text("System gestoppt",True)
+    lcd.display_two_lines("System gestoppt","_x_",True)
     sleep(2)
 finally:
     gp.cleanup()
     lcd.clear()
+    pk.tor_zu
