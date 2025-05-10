@@ -39,16 +39,14 @@ try:
         freie_plaetze = pk.get_parkp()
         lcd.display_two_lines("Verfuegbar:", f"{freie_plaetze} Plaetze",True)
         
-        light.red_on(False,False)
-        light.green_on()
-        
-        
+                
 # Einfahrt -> Sensor A aktiviert >> 
         if pk.is_activeted("a"):
             
             if pk.get_parkp() == 0:
                 light.red_on(False)
-                light.green_on(False,True)
+                light.green_on(True,False)
+                light.danger()
                 lcd.display_two_lines("Kein Platz","frei",True)
                 sleep(2)
                 
@@ -66,6 +64,20 @@ try:
             light.green_on(False,False)
             lcd.display_two_lines("Ausfahrt erkannt","<<<",True)
             pk.ausfahrt()
+        
+        elif pk.get_parkp() == 0:
+            light.red_on(False)
+            light.green_on(True,False)
+        
+        elif pk.get_parkp() == 4:
+            light.red_on(True,False)
+            light.green_on(False,True)
+        
+        elif pk.get_parkp() > 0:        
+            light.red_on(False,False)
+            light.green_on()
+           
+                
         
         
 
