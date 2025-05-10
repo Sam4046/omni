@@ -3,6 +3,7 @@ from classes.Mojo import Mojo
 from classes.LCD import LCD
 from classes.Key import Manuell
 from classes.Traffic import Traffic
+import RPi.GPIO as gp
 import sys
 import select
 import tty
@@ -12,6 +13,8 @@ import termios
 pk = Mojo()
 lcd = LCD()
 light = Traffic()
+
+
 # def tor_zu_mit_sicherheitscheck():
 #     close_delay = 3
 #     print("⬇️ Schranke fährt in", close_delay, "Sekunden runter...")
@@ -67,16 +70,24 @@ light = Traffic()
 
 # Startinfo
 print("🚀 Parkhaussystem gestartet...")
+
+lcd.clear()
+
 pk.auto_recovery()
+
 lcd.display_two_lines("Parkhaus bereit", f"Frei: {pk.get_parkp()}")
+sleep(3)
+
 light.led_off()
+
 light.cleanPi()
 
 try:
     while True:
         #>>> Tasteneingaben prüfen <<<
         freie_plaetze = pk.get_parkp()
-        lcd.display_two_lines("Verfuegbar:", f"{freie_plaetze} Plaetze")
+        lcd.display_two_lines("Verfuegbar:", f"{freie_plaetze} Plaetze",True)
+        
         
         light.green_on()
         
@@ -84,29 +95,33 @@ try:
         # Sensor A = Einfahrt
         if pk.is_activeted("a"):
             light.red_on()
-            lcd.display_text("Einfahrt erkannt")
+            lcd.display_text("Einfahrt erkannt",True)
             pk.tor_auf()
             timeout = time() + 3
             
             while time() < timeout:
-                
-                
-                
+            
                 if pk.is_activeted("b"):
+                    lcd.display_two_lines("Haerzlich","Willkommen",True)
                     pk.drop_parkplatz()
                     break
                 sleep(0.02)
 
         # Sensor B = Ausfahrt
         elif pk.is_activeted("b"):
+            
             light.red_on()
             lcd.display_text("Ausfahrt erkannt")
             pk.tor_auf()
             timeout = time() + 3
+            
             while time() < timeout:
+                
                 if pk.is_activeted("b"):
+                    lcd.display_two_lines("Auf","Wiedersehen",True)
                     pk.add_parkplatz()
                     break
+                
                 sleep(0.02)
 
         sleep(0.02)
@@ -116,5 +131,5 @@ except KeyboardInterrupt:
     lcd.display_text("System gestoppt")
     sleep(2)
 finally:
-    pk.cleanup()
+    gp.cleanup()
     lcd.clear()
