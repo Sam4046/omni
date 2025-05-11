@@ -68,8 +68,21 @@ class LCD:
         """Display two separate lines."""
         self.send_string(str(text_line1)[:self.LCD_WIDTH], self.LCD_LINE_1, center)
         self.send_string(str(text_line2)[:self.LCD_WIDTH], self.LCD_LINE_2, center)
+    
+    def scroll_text(self, text, line=1, delay=0.3, repeat=1):
+        """Scroll a long text on the display."""
+        text = str(text)
+        text += " " * self.LCD_WIDTH  # Abstand zum Wiederanfang
+        display_line = self.LCD_LINE_1 if line == 1 else self.LCD_LINE_2
+
+        for _ in range(repeat):
+            for i in range(len(text) - self.LCD_WIDTH + 1):
+                part = text[i:i + self.LCD_WIDTH]
+                self.send_string(part, display_line)
+                time.sleep(delay)
 
     def clear(self):
         """Clear the LCD display."""
         self.send_byte(0x01, self.LCD_CMD)
         time.sleep(0.2)
+    

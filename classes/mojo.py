@@ -3,13 +3,15 @@ from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
-
+from LCD import LCD 
+import random as rnd
 # gp.setmode(gp.BOARD) # Board Pins (deaktiviert)
 gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
 
 # Sensore definieren
 gp.setup(24, gp.IN, pull_up_down=gp.PUD_UP) 
 gp.setup(25, gp.IN, pull_up_down=gp.PUD_UP)
+v = LCD()
 
 class Mojo:
     def __init__(self):
@@ -27,6 +29,9 @@ class Mojo:
             [0, 0, 0, 1], 
             [1, 0, 0, 1]
             ]
+        
+        self.heyMsg=["Hallo","Moin","Willkommen","Viel Spass!","Guten Tag"]
+        self.beyMsg=["Tciao","Tschuess","Adios","Auf Wiedersehen","Schoenen Tag noch"]
         
         self.pos = 0                # Definieren von Position 0 = Tor ist zu
         self.max_schritte = 130     # Nach 130 Schritten geht die Tor ist auf oder Max Position
@@ -94,12 +99,25 @@ class Mojo:
 # Funktion Schritte zu fahren.
     def step_motor(self, steps, direction=1):
         # Scleife lauft bis Tor ganz auf oder zu
+        closing = True
         for _ in range(steps): 
             if (direction == 1 and self.pos >= self.max_schritte) or (direction == -1 and self.pos <= 0):
                 break
+            
+        # Sicherheitsabbruch beim Schließen, falls Sensor aktiv
+            if direction == -1 and (self.is_activeted("a") or self.is_activeted("b")):
+                print("🛑 Sensor erkannt während Schließen! Tor wird erneut geöffnet.")
+                self.tor_auf()
+                sleep(3)
+                self.tor_zu()
+                return
+
+                
             for step in (self.step_sequence if direction > 0 else reversed(self.step_sequence)): # wenn direction 1 nach Uhrzeigen ausserdenn rueckwerts
                 self.set_step(step) 
                 sleep(0.002)  # Motorbeschleunigung (1 sek / 500 )
+               
+                    
             self.pos += direction
             self.save_position()
         # Speichert die aktuelle Position nach jeder Bewegung
@@ -115,16 +133,6 @@ class Mojo:
     # Time 
         if self.pos > 0:
             self.step_motor(self.pos, direction=-1)                
-    # Timerzaehler       
-        if time > 0:
-            print (" ⬇️ die Schranke fährt runter in :") 
-            for i in range(time):
-                a= self.is_activeted("a")
-                b= self.is_activeted("b")
-                if not a or not b :
-                    sleep(1)
-                    print (" ... ",i)
-                print (" Tor ist zu ") 
             
 # Funktion fuer die Einfahrtprozess
     def einfahrt(self):
@@ -134,7 +142,8 @@ class Mojo:
             timeout = time() + 3  # Maximale Wartezeit für Sensor
             
             while time() < timeout:
-                if not gp.input(self.irs_exit):  
+                if not gp.input(self.irs_exit):
+                    v.display_text(rnd.randint(self.heyMsg))  
                     self.drop_parkplatz()
                     self.tor_zu()
                     return
@@ -152,7 +161,8 @@ class Mojo:
             timeout = time() + 3  # Maximale Wartezeit für Sensor
             
             while time() < timeout:
-                if not gp.input(self.irs_enter):  
+                if not gp.input(self.irs_enter): 
+                    v.display_text(rnd.randint(self.beyMsg))    
                     self.add_parkplatz()
                     self.tor_zu()
                     return
