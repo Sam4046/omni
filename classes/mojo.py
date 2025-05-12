@@ -3,7 +3,7 @@ from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
-from lcd import LCD 
+# from lcd import LCD 
 import random as rnd
 # gp.setmode(gp.BOARD) # Board Pins (deaktiviert)
 gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
@@ -11,7 +11,7 @@ gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
 # Sensore definieren
 gp.setup(24, gp.IN, pull_up_down=gp.PUD_UP) 
 gp.setup(25, gp.IN, pull_up_down=gp.PUD_UP)
-v = LCD()
+# v = LCD()
 
 class Mojo:
     def __init__(self):
@@ -107,9 +107,10 @@ class Mojo:
         # Sicherheitsabbruch beim Schließen, falls Sensor aktiv
             if direction == -1 and (self.is_activeted("a") or self.is_activeted("b")):
                 print("🛑 Sensor erkannt während Schließen! Tor wird erneut geöffnet.")
-                self.tor_auf()
-                sleep(3)
-                self.tor_zu()
+                if self.is_activeted("a"):
+                    self.einfahrt()
+                elif self.is_activeted("b"):
+                    self.ausfahrt()
                 return
 
                 
@@ -143,7 +144,7 @@ class Mojo:
             
             while time() < timeout:
                 if not gp.input(self.irs_exit):
-                    v.display_text(rnd.randint(self.heyMsg))  
+                    # v.display_text(f'{rnd.randint(self.heyMsg)}',True)  
                     self.drop_parkplatz()
                     self.tor_zu()
                     return
@@ -162,7 +163,7 @@ class Mojo:
             
             while time() < timeout:
                 if not gp.input(self.irs_enter): 
-                    v.display_text(rnd.randint(self.beyMsg))    
+                    # v.display_text(f'{rnd.randint(self.beyMsg)}',True)     
                     self.add_parkplatz()
                     self.tor_zu()
                     return
