@@ -188,3 +188,7 @@ class Traffic:
 
     def cleanPi(self):
         GPIO.cleanup()
+
+    def get_state(self):
+        return self.state
+    

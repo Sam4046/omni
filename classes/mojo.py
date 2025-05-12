@@ -129,7 +129,7 @@ class Mojo:
             self.step_motor(self.max_schritte - self.pos, direction=1)
 
 # Funktoin Rampa hoch
-    def tor_zu(self,time=3):
+    def tor_zu(self):
     # Time 
         if self.pos > 0:
             self.step_motor(self.pos, direction=-1)                

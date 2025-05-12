@@ -24,10 +24,14 @@ light.red_on()
 
 pk.auto_recovery()
 
+
+
 lcd.display_two_lines("Parkhaus bereit", f"Frei: {pk.get_parkp()}",True)
 sleep(3)
 
+#Start test 
 light.red_on()
+light.danger()
 light.led_off()
 
 light.green_on()
@@ -64,14 +68,17 @@ try:
             light.green_on(False,False)
             lcd.display_two_lines("Ausfahrt erkannt","<<<",True)
             pk.ausfahrt()
+
         
         elif pk.get_parkp() == 0:
             light.red_on(False)
             light.green_on(True,False)
+
         
         elif pk.get_parkp() == 4:
             light.red_on(True,False)
             light.green_on(False,True)
+
         
         elif pk.get_parkp() > 0:        
             light.red_on(False,False)
