@@ -3,7 +3,7 @@ from gpiozero import OutputDevice
 import csv
 import os  # Für Datei-Existenzprüfung
 from time import sleep, time
-from LCD import LCD 
+from lcd import LCD 
 import random as rnd
 # gp.setmode(gp.BOARD) # Board Pins (deaktiviert)
 gp.setmode(gp.BCM) # Mode in pi nach GPIO Pins numm
@@ -54,7 +54,7 @@ class Mojo:
         
         
     def auto_recovery(self):
-        self.tor_zu(0)
+        self.tor_zu()
         
      
 # Speichert die aktuelle Position in einer CSV-Datei        
@@ -150,7 +150,7 @@ class Mojo:
                 sleep(0.02)  # Schnellere Erkennung
             
             print("❌ Einfahrt abgebrochen. Schranke fährt runter...")
-            self.tor_zu(0)
+            self.tor_zu()
         return self.parkp
             
 # Funktion fuer die Ausfahrtprozess
@@ -169,7 +169,7 @@ class Mojo:
                 sleep(0.02)  # Schnellere Erkennung
             
             print("❌ Ausfahrt abgebrochen. Schranke fährt runter...")
-            self.tor_zu(0)
+            self.tor_zu()
             
         else:
             print("🚫 Kein registriertes Auto im Parkhaus, Ausfahrt verweigert!")

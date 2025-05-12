@@ -1,7 +1,7 @@
 from time import sleep, time
-from classes.Mojo import Mojo
-from classes.LCD import LCD
-from classes.Key import Manuell
+from classes.mojo import Mojo
+from classes.lcd import LCD
+from classes.key import Manuell
 from classes.Traffic import Traffic
 import RPi.GPIO as gp
 import sys
