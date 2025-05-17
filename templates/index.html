@@ -51,8 +51,8 @@
       </div>
       {% endif %}
 
-      <a href="/tor-auf" class="btn btn-primary btn-lg">🔓 Tor öffnen</a>
-      <a href="/tor-zu" class="btn btn-warning btn-lg">🔒 Tor schließen</a>
+      <button onclick="sendCommand('tor_auf')" class="btn btn-primary btn-lg">🔓 Tor öffnen</button>
+      <button onclick="sendCommand('tor_zu')" class="btn btn-warning btn-lg">🔒 Tor schließen</button>
       <a href="/key" class="btn btn-outline-light btn-sm mt-3">🔧 Manuelle Steuerung</a>
     </div>
   </div>
@@ -111,6 +111,17 @@
       } catch (e) {
         console.error("Fehler beim Abrufen des Status", e);
       }
+    }
+    function sendCommand(cmd) {
+      fetch("/api/send/" + cmd)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log("Befehl gesendet:", data.cmd);
+          } else {
+            alert("Fehler: " + data.error);
+          }
+        });
     }
   </script>
 
