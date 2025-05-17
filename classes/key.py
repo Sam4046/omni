@@ -1,5 +1,5 @@
 import RPi.GPIO as gp
-from MotorControler import MotorController  # Gemeinsamer Motorcontroller
+from classes.MotorControler import MotorController  # Gemeinsamer Motorcontroller
 import sys
 import termios
 import tty
@@ -12,20 +12,23 @@ class Manuell:
     def __init__(self):
         self.motor = MotorController()
         print(f"🔄 Letzte Motorposition: {self.motor.pos}")
-
+    
+    def step(self,step=1,dir=1):
+        self.motor.step_motor(step, dir)
+            
     def steuerung(self):
         print("\n🎮 **Manuelle Steuerung aktiviert** 🎮")
         print("W = Schritt hoch | S = Schritt runter")
         print("D = Tor auf | A = Tor zu | Q = Beenden\n")
-
+   
         while True:
             key = self.get_key()
             if key == "w":
                 print("⬆️ Schritt hoch")
-                self.motor.step_motor(1, direction=1)
+                self.step(1,1)
             elif key == "s":
                 print("⬇️ Schritt runter")
-                self.motor.step_motor(1, direction=-1)
+                self.step(1,-1)
             elif key == "d":
                 self.motor.tor_auf()
             elif key == "a":

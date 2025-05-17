@@ -2,7 +2,7 @@ import RPi.GPIO as gp
 import csv
 import os
 from time import sleep, time
-from MotorControler import MotorController  # Neue Importstelle für Motorsteuerung
+from classes.MotorControler import MotorController  # Neue Importstelle für Motorsteuerung
 
 
 
@@ -12,7 +12,6 @@ class Mojo:
         self.motor = MotorController()
 
         
-
         
         # Parkplätze
         self.max_pp = 4
