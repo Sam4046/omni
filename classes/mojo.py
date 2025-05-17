@@ -97,5 +97,8 @@ class Mojo:
 
     def get_parkp(self):
         return self.parkp
+    
+    def is_activeted(self,val):
+        return self.motor.is_activeted(val)
 
     
