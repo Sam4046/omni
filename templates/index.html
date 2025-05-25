@@ -56,7 +56,8 @@
       <a href="/key" class="btn btn-outline-light btn-sm mt-3">🔧 Manuelle Steuerung</a>
     </div>
   </div>
-  <audio id="ding" src="beep-07a.mp3" preload="auto"></audio>
+  <audio id="ding" src="{{ url_for('static', filename='beep-07a.mp3') }}" preload="auto"></audio>
+
 
 
   <script>

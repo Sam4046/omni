@@ -30,6 +30,11 @@ def tor_auf():
 def tor_zu():
     return redirect(url_for('send_cmd', cmd="tor_zu"))
 
+@app.route('/key')
+def key_control():
+    return render_template('key.html')
+
+
 @app.route('/api/status')
 def status():
     try:
@@ -40,14 +45,22 @@ def status():
 
 @app.route('/api/send/<cmd>')
 def send_cmd(cmd):
-    if cmd not in ["tor_auf", "tor_zu"]:
+    erlaubte_befehle = [
+        "tor_auf", "tor_zu",
+        "step_up", "step_down",
+        "reset_pos", "reset_parkp"
+    ]
+
+    if cmd not in erlaubte_befehle:
         return jsonify(success=False, error="Ungültiger Befehl")
+
     try:
-        with open(CMD_PATH, "w") as f:
+        with open("ipc/command.json", "w") as f:
             json.dump({"action": cmd}, f)
         return jsonify(success=True, cmd=cmd)
     except Exception as e:
         return jsonify(success=False, error=str(e))
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

@@ -39,7 +39,7 @@ def write_status():
     with open(STATUS_PATH, "w") as f:
         json.dump({
             "frei": pk.get_parkp(),
-            "tor_offen": pk.motor.pos > 0
+            "tor_offen": pk.pos > 0
         }, f)
 
 # Start
@@ -58,8 +58,8 @@ try:
         # Sensor A (Einfahrt)
         if pk.is_activeted("a"):
             if freie_plaetze == 0:
-                light.red_on(False)
-                light.green_on(True, False)
+                light.red_on(True)
+                light.green_on(False)
                 light.danger()
                 lcd.display_two_lines("Kein Platz", "frei", True)
                 sleep(2)
@@ -71,18 +71,26 @@ try:
 
         # Sensor B (Ausfahrt)
         elif pk.is_activeted("b"):
-            light.red_on()
-            light.green_on(False, False)
-            lcd.display_two_lines("Ausfahrt erkannt", "<<<", True)
-            pk.ausfahrt()
-
+            if freie_plaetze == 4:
+                light.red_on(True)
+                light.green_on(False,False)
+                light.danger()
+                lcd.display_two_lines("Kein glueltige", "Regestrierung", True)
+            else:    
+                light.red_on()
+                light.green_on(False, False)
+                lcd.display_two_lines("Ausfahrt erkannt", "<<<", True)
+                pk.ausfahrt()
+    
         # Lichtsteuerung
         elif freie_plaetze == 0:
             light.red_on(False)
             light.green_on(True, False)
+            
         elif freie_plaetze == 4:
             light.red_on(True, False)
             light.green_on(False, True)
+            
         else:
             light.red_on(False, False)
             light.green_on()
@@ -95,6 +103,28 @@ try:
         elif cmd == "tor_zu":
             pk.tor_zu()
             clear_command()
+            
+        elif cmd == "step_up":
+            pk.motor.step_motor(1, direction=1)
+            clear_command()
+        
+        elif cmd == "step_down":
+            pk.motor.step_motor(1, direction=-1)
+            clear_command()
+        
+        elif cmd == "reset_pos":
+            with open("last_pos.csv", "w") as f:
+                f.write("0\n")
+            pk.motor.pos = 0
+            pk.motor.save_position()
+            clear_command()
+        
+        elif cmd == "reset_parkp":
+            pk.parkp = pk.max_pp
+            pk.save_parkp()
+            clear_command()
+        
+        
 
         sleep(0.1)
 
@@ -103,6 +133,10 @@ except KeyboardInterrupt:
     lcd.display_two_lines("System gestoppt", "_x_", True)
     sleep(2)
 finally:
+    try:
+        gp.setmode(gp.BCM)
+        pk.tor_zu()
+    except Exception as e:
+        print(f"⚠️ Fehler beim Schließen: {e}")
     gp.cleanup()
     lcd.clear()
-    pk.tor_zu()

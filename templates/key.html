@@ -11,14 +11,28 @@
   <div class="container">
     <h1>🎮 Manuelle Steuerung</h1>
     <div class="d-grid gap-3 mt-4">
-      <a href="/key/up" class="btn btn-success btn-lg">⬆ Schritt hoch</a>
-      <a href="/key/down" class="btn btn-warning btn-lg">⬇ Schritt runter</a>
-      <a href="/key/open" class="btn btn-primary btn-lg">🔓 Tor öffnen</a>
-      <a href="/key/close" class="btn btn-danger btn-lg">🔒 Tor schließen</a>
-      <a href="/key/reset" class="btn btn-secondary btn-lg">🔁 Position zurücksetzen</a>
+      <button onclick="sendCommand('step_up')" class="btn btn-success btn-lg">⬆ Schritt hoch</button>
+      <button onclick="sendCommand('step_down')" class="btn btn-warning btn-lg">⬇ Schritt runter</button>
+      <button onclick="sendCommand('tor_auf')" class="btn btn-primary btn-lg">🔓 Tor öffnen</button>
+      <button onclick="sendCommand('tor_zu')" class="btn btn-danger btn-lg">🔒 Tor schließen</button>
+      <button onclick="sendCommand('reset_pos')" class="btn btn-secondary btn-lg">🔁 Torposition zurücksetzen</button>
+      <button onclick="sendCommand('reset_parkp')" class="btn btn-info btn-lg">♻️ Parkplätze zurücksetzen</button>
       <a href="/" class="btn btn-outline-light mt-4">⬅ Zurück</a>
     </div>
   </div>
 
+  <script>
+    function sendCommand(cmd) {
+      fetch('/api/send/' + cmd)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log("✅ Gesendet:", cmd);
+          } else {
+            alert("❌ Fehler: " + data.error);
+          }
+        });
+    }
+  </script>
 </body>
 </html>

@@ -1,93 +1,200 @@
+from time import sleep as out
 import RPi.GPIO as GPIO
-from time import sleep
+
+
 
 class Traffic:
-    def __init__(self, red_en=7, green_en=8, red_ex=4, green_ex=17, buzzer=27):
+    def __init__(self,
+        red_en = 7,
+        green_en = 8,
+        red_ex = 4,
+        green_ex = 17,
+        buzzer = 27,
+        ):
+
         GPIO.setmode(GPIO.BCM)
-        self.pins = {
-            "red_en": red_en,
-            "green_en": green_en,
-            "red_ex": red_ex,
-            "green_ex": green_ex,
-            "buzzer": buzzer
-        }
-        self.state = {key: False for key in self.pins if key != "buzzer"}
 
-        for pin in self.pins.values():
-            GPIO.setup(pin, GPIO.OUT)
+        self.red_en = red_en
+        self.green_en = green_en
+        self.red_ex = red_ex
+        self.green_ex = green_ex
+        self.buzzer = buzzer
+        
+        # 0= red_en, 1= green_en, 2= red_ex, 3= green_ex
+        self.state=[
+            False,
+            False,
+            False,
+            False 
+        ]
+        
+        self.list_led_low = ["low_all", 
+                             "low_en", 
+                             "low_ex", 
+                             "low_red_en", 
+                             "low_green_en", 
+                             "low_red_ex", 
+                             "low_green_ex"
+                             ]
+        
+        #LEDs and Buzzer definieren
+        GPIO.setup(self.red_en, GPIO.OUT)
+        GPIO.setup(self.green_en, GPIO.OUT)
+        GPIO.setup(self.red_ex, GPIO.OUT)
+        GPIO.setup(self.green_ex, GPIO.OUT)
+        GPIO.setup(self.buzzer, GPIO.OUT)
 
-    def _set_light(self, color, en=True, ex=True, alone=False):
-        """Interne Methode zur Lichtsteuerung (rot oder grün)."""
-        en_pin = self.pins[f"{color}_en"]
-        ex_pin = self.pins[f"{color}_ex"]
-
-        if alone:
-            if en:
-                GPIO.output(en_pin, 1)
-                self.state[f"{color}_en"] = True
-            elif ex:
-                GPIO.output(ex_pin, 1)
-                self.state[f"{color}_ex"] = True
+#buzzer on/off
+    def high_buz(self,on=True):
+        if on:
+            GPIO.output(self.buzzer, 1)
         else:
-            GPIO.output(en_pin, int(en))
-            GPIO.output(ex_pin, int(ex))
-            self.state[f"{color}_en"] = en
-            self.state[f"{color}_ex"] = ex
+            GPIO.output(self.buzzer, 0)
+# Traffic Light Controller
+    def red_on(self,en=True,ex=True,alone=False):
 
-    def red_on(self, en=True, ex=True, alone=False):
-        self._set_light("red", en, ex, alone)
+        if not alone:
+            if en and ex:
+                GPIO.output(self.red_en, 1)
+                GPIO.output(self.red_ex, 1)
+                self.state[0] = True
+                self.state[2] = True 
+                
+            elif en and not ex:
+                GPIO.output(self.red_en, 1)
+                GPIO.output(self.red_ex, 0)
+                self.state[0] = True
+                self.state[2] = False
+                
+            elif not en and ex:
+                GPIO.output(self.red_en, 0)
+                GPIO.output(self.red_ex, 1)
+                self.state[0] = False
+                self.state[2] = True
+                
+            else:
+                GPIO.output(self.red_en, 0)
+                GPIO.output(self.red_ex, 0)
+                self.state[0] = False
+                self.state[2] = False
+                
+        else:
+            if en:
+                GPIO.output(self.red_en, 1)
+                self.state[0] = True
+                
+            else:
+                GPIO.output(self.red_ex, 1)
+                self.state[2] = True
 
-    def green_on(self, en=True, ex=True, alone=False):
-        self._set_light("green", en, ex, alone)
+    def green_on(self,en=True,ex=True,alone=False):
 
+        if not alone:
+            
+            if en and ex:
+                GPIO.output(self.green_en, 1)
+                GPIO.output(self.green_ex, 1)
+                self.state[1] = True
+                self.state[3] = True 
+                
+            elif en and not ex:
+                GPIO.output(self.green_en, 1)
+                GPIO.output(self.green_ex, 0)
+                self.state[1] = True
+                self.state[3] = False 
+                
+            elif not en and ex:    
+                GPIO.output(self.green_en, 0)
+                GPIO.output(self.green_ex, 1)
+                self.state[1] = False
+                self.state[3] = True 
+                
+            else:
+                GPIO.output(self.green_en, 0)
+                GPIO.output(self.green_ex, 0)
+                self.state[1] = False
+                self.state[3] = False
+                
+        else:
+            
+            if en:
+                GPIO.output(self.green_en, 1)
+                self.state[1] = True
+                
+            elif ex:
+                
+                GPIO.output(self.green_ex, 1)
+                self.state[3] = True 
+            else:
+                pass
     def led_off(self, mode="low_all"):
-        """Schaltet LEDs selektiv aus."""
-        modes = {
-            "low_all": ["red_en", "green_en", "red_ex", "green_ex"],
-            "low_en": ["red_en", "green_en"],
-            "low_ex": ["red_ex", "green_ex"],
-            "low_red_en": ["red_en"],
-            "low_green_en": ["green_en"],
-            "low_red_ex": ["red_ex"],
-            "low_green_ex": ["green_ex"]
-        }
+
+        """
+        mode indexex 0. All OFF     | 1. Entry OFF   | 2. Exit OFF    |3. Red Entry   | 4. Green Entry | 5. Red Exit    | 6. Green Exit  |
+        """
 
         if isinstance(mode, int):
-            mode = list(modes.keys())[mode] if 0 <= mode < len(modes) else None
-
-        if mode not in modes:
-            print(f"[Warnung] Ungültiger Modus für led_off(): {mode}")
+            if 0 <= mode < len(self.list_led_low):
+                mode = self.list_led_low[mode]
+            else:
+                print(f"[Warnung] Ungültiger Index für led_off(): {mode}")
+                return
+        elif mode not in self.list_led_low:
+            print(f"[Warnung] Ungültiger Modusname für led_off(): {mode}")
             return
 
-        for key in modes[mode]:
-            GPIO.output(self.pins[key], 0)
-            self.state[key] = False
+        if mode == "low_all":
+            GPIO.output(self.red_en, 0)
+            GPIO.output(self.green_en, 0)
+            GPIO.output(self.red_ex, 0)
+            GPIO.output(self.green_ex, 0)
+            self.state[0] = False
+            self.state[1] = False
+            self.state[2] = False
+            self.state[3] = False  
 
-    def high_buz(self, on=True):
-        GPIO.output(self.pins["buzzer"], int(on))
+        elif mode == "low_en":
+            GPIO.output(self.red_en, 0)
+            GPIO.output(self.green_en, 0)
+            self.state[0] = False
+            self.state[1] = False
+            
+        elif mode == "low_ex":
+            GPIO.output(self.red_ex, 0)
+            GPIO.output(self.green_ex, 0)
+            self.state[2] = False
+            self.state[3] = False
 
-    def beep(self, sleep_high=0.3, sleep_low=0.2, repeat=1):
-        for _ in range(repeat):
-            self.high_buz(True)
-            sleep(sleep_high)
+        elif mode == "low_red_en":
+            GPIO.output(self.red_en, 0)
+            self.state[0] = False
+
+        elif mode == "low_green_en":
+            GPIO.output(self.green_en, 0)
+            self.state[1] = False
+
+        elif mode == "low_red_ex":
+            GPIO.output(self.red_ex, 0)
+            self.state[2] = False
+
+        elif mode == "low_green_ex":
+            GPIO.output(self.green_ex, 0)
+            self.state[3] = False 
+
+    #Seriene
+    def danger(self,sleepTime=0.3):
+        self.test_buzz(3)
+        
+    def test_buzz(self,repaet=1,sleep_high=0.3,sleep_low=0.3):
+        for i in range(repaet):
+            self.high_buz()
+            out(sleep_high)
             self.high_buz(False)
-            sleep(sleep_low)
-
-    def danger(self):
-        self.beep(0.7, 0.2, 3)
-
-    def test_buzz(self):
-        self.beep(0.5, 0.2, 2)
-
-    def test_leds(self):
-        self.red_on()
-        sleep(0.5)
-        self.green_on()
-        sleep(0.5)
-        self.led_off()
+            out(sleep_low)
 
     def cleanPi(self):
         GPIO.cleanup()
 
     def get_state(self):
         return self.state
+    
