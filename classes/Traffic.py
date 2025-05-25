@@ -122,6 +122,7 @@ class Traffic:
                 self.state[1] = True
                 
             elif ex:
+                
                 GPIO.output(self.green_ex, 1)
                 self.state[3] = True 
             else:
@@ -182,9 +183,14 @@ class Traffic:
 
     #Seriene
     def danger(self,sleepTime=0.3):
-        self.high_buz()
-        out(sleepTime)
-        self.high_buz(False)
+        self.test_buzz(3)
+        
+    def test_buzz(self,repaet=1,sleep_high=0.3,sleep_low=0.3):
+        for i in range(repaet):
+            self.high_buz()
+            out(sleep_high)
+            self.high_buz(False)
+            out(sleep_low)
 
     def cleanPi(self):
         GPIO.cleanup()

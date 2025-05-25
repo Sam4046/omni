@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "omni",
+			"path": "."
+		},
+		{
+			"name": "ipc",
+			"path": "../../../Gits/omni-Web-server/omni-Web-server/ipc"
+		}
+	],
+	"settings": {}
+}

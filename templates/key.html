@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manuelle Steuerung</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white p-4 text-center">
+
+  <div class="container">
+    <h1>🎮 Manuelle Steuerung</h1>
+    <div class="d-grid gap-3 mt-4">
+      <button onclick="sendCommand('step_up')" class="btn btn-success btn-lg">⬆ Schritt hoch</button>
+      <button onclick="sendCommand('step_down')" class="btn btn-warning btn-lg">⬇ Schritt runter</button>
+      <button onclick="sendCommand('tor_auf')" class="btn btn-primary btn-lg">🔓 Tor öffnen</button>
+      <button onclick="sendCommand('tor_zu')" class="btn btn-danger btn-lg">🔒 Tor schließen</button>
+      <button onclick="sendCommand('reset_pos')" class="btn btn-secondary btn-lg">🔁 Torposition zurücksetzen</button>
+      <button onclick="sendCommand('reset_parkp')" class="btn btn-info btn-lg">♻️ Parkplätze zurücksetzen</button>
+      <a href="/" class="btn btn-outline-light mt-4">⬅ Zurück</a>
+    </div>
+  </div>
+
+  <script>
+    function sendCommand(cmd) {
+      fetch('/api/send/' + cmd)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            console.log("✅ Gesendet:", cmd);
+          } else {
+            alert("❌ Fehler: " + data.error);
+          }
+        });
+    }
+  </script>
+</body>
+</html>
